@@ -1,0 +1,8 @@
+"0","aa<-df1"
+"0","aa <- aa %>% filter(date == Sys.Date()-1)"
+"0","valueBox("
+"0","  value = paste(format((aa$newCases), big.mark = "",""), """", sep = "" ""),"
+"0","  caption = ""New conformed cases"","
+"0","  icon = ""fas fa-user-md"","
+"0","  color = confirmed_color"
+"0",")"

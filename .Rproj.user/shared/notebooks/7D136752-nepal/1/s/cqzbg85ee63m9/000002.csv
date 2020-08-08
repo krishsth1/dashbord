@@ -1,0 +1,7 @@
+"0",""
+"0","valueBox("
+"0","  value = paste(format((df$tested_total), big.mark = "",""), """", sep = "" ""),"
+"0","  caption = ""Total PCR testing"","
+"0","  icon = ""fas fa-user-md"","
+"0","  color = ""pink"""
+"0",")"

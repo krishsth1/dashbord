@@ -1,0 +1,43 @@
+"0","plotly::plot_ly(data = df2) %>%
+  plotly::add_trace(
+    x = ~date,
+    y = ~totalCases,
+    type = ""scatter"",
+    mode = ""lines+markers"",
+    name = ""Confirmed"",
+    line = list(color = active_color),
+    marker = list(color = active_color)
+  ) %>%
+  plotly::add_trace(
+    x = ~date,
+    y = ~totalDeaths,
+    type = ""scatter"",
+    mode = ""lines+markers"",
+    name = ""Death"",
+    line = list(color = death_color),
+    marker = list(color = death_color)
+  ) %>%
+  
+  plotly::add_trace(
+    x = ~date,
+    y = ~totalRecoveries,
+    type = ""scatter"",
+    mode = ""lines+markers"",
+    name = ""Recovered"",
+    line = list(color = ""black""),
+    marker = list(color =""black"")
+  ) %>%
+  
+  plotly::layout(
+    title = """",
+    yaxis = list(title = ""Cumulative number of cases""),
+    xaxis = list(title = ""Date""),
+    legend = list(x = 0.1, y = 0.9),
+    hovermode = ""compare""
+  )
+"
+"2","`arrange_()` is deprecated as of dplyr 0.7.0.
+Please use `arrange()` instead.
+See vignette('programming') for more help
+[90mThis warning is displayed once every 8 hours.[39m
+[90mCall `lifecycle::last_warnings()` to see where this warning was generated.[39m"

@@ -1,0 +1,275 @@
+---
+title: "Covid-19 Cases in Nepal" 
+author: "Krishna Kumar Shrestha"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    source_code: embed
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+#------------------ Packages ------------------
+library(flexdashboard)
+
+
+library(tidyverse)
+library(RColorBrewer)
+
+
+confirmed_color <- "purple"
+active_color <- "#1f77b4"
+recovered_color <- "forestgreen"
+death_color <- "red"
+#------------------ Data ------------------
+library(dplyr)
+library(jsonlite)
+library(lubridate)
+
+df <- fromJSON("https://nepalcorona.info/api/v1/data/nepal") %>%
+  as.data.frame() %>%
+  select(1:9)
+
+```
+
+
+```{r}
+x<- "2020-07-01"
+x<-ymd(x)
+df1<- fromJSON("https://data.nepalcorona.info/api/v1/covid/timeline") 
+df1$date <- ymd(df1$date)
+
+df1<- df1%>%
+  
+  filter(date <= Sys.Date() & date > x) 
+
+
+```
+
+
+
+Summary
+=======================================================================
+
+Row {data-width=400}
+-----------------------------------------------------------------------
+
+### confirmed {.value-box}
+
+```{r}
+
+valueBox(
+  value = paste(format(sum(df$tested_positive), big.mark = ","), "", sep = " "),
+  caption = "Total confirmed cases",
+  icon = "fas fa-user-md",
+  color = confirmed_color
+)
+```
+
+
+### death {.value-box}
+
+```{r}
+
+valueBox(
+  value = paste(format(sum(df$deaths, na.rm = TRUE), big.mark = ","), " (",
+    round(100 * df$deaths / df$tested_positive,3),
+    "%)",
+    sep = ""
+  ),
+  caption = "Death cases (death rate)",
+  icon = "fas fa-heart-broken",
+  color = death_color
+)
+```
+
+
+### recovered {.value-box}
+
+```{r}
+
+valueBox(
+  value = paste(format(sum(df$recovered, na.rm = TRUE), big.mark = ","), " (",
+    round(100 * df$recovered / df$tested_positive,3),
+    "%)",
+    sep = ""
+  ),
+  caption = "Recovered cases (recovered rate)",
+  icon= "fas fa-heartbeat",
+  
+  color = "green"
+)
+```
+
+
+### PCR testing {.value-box}
+
+```{r}
+
+valueBox(
+  value = paste(format((df$tested_total), big.mark = ","), "", sep = " "),
+  caption = "Total PCR testing",
+  icon = "fas fa-user-md",
+  color = "pink"
+)
+```
+
+Row {data-width=400}
+-----------------------------------------------------------------------
+### New cases {.value-box}
+
+```{r}
+aa<-df1
+aa <- aa %>% filter(date == Sys.Date()-1)
+valueBox(
+  value = paste(format((aa$newCases), big.mark = ","), "", sep = " "),
+  caption = "New conformed cases",
+  icon = "fas fa-user-md",
+  color = confirmed_color
+)
+```
+
+
+
+  
+    
+    
+
+### New recover {.value-box}
+
+```{r}
+
+valueBox(
+  value = paste(format((aa$newRecoveries), big.mark = ","), "", sep = " "),
+  caption = "New recovered cases",
+  icon = "fas fa-heartbeat",
+  color = "green"
+)
+```
+
+
+
+
+
+
+
+Daily cases
+=======================================================================
+  
+  
+  
+-------------------------------------
+```{r}
+df1 %>%
+  plotly::plot_ly() %>%
+  plotly::add_trace(
+    x = ~date,
+    y = ~newCases,
+    text = ~newCases,
+    textposition = 'auto',
+    type = "bar",
+    name = "Confirmed") %>% 
+  # plotly::add_trace(
+  #   x = ~date,
+  #   y = ~Malawi,
+  #   type = "bar",
+  #   name = "Recovered")%>% 
+  #  plotly::add_trace(
+  #   x = ~date,
+  #   y = ~Malawi,
+  #   type = "bar",
+  #   name = "Deaths")%>% 
+  plotly::layout(
+    title = "",
+    legend = list(x = 0.1, y = 0.9),
+    yaxis = list(title = "New confirmed cases"),
+    xaxis = list(title = "Date"))
+
+```
+
+
+
+
+ Trend
+======================================================================
+
+
+
+-------------------------------------
+
+    
+```{r}
+
+
+df2<- fromJSON("https://data.nepalcorona.info/api/v1/covid/timeline")
+df2$date <-ymd(df2$date)
+df2 <- df2 %>% filter(date <= Sys.Date())
+plotly::plot_ly(data = df2) %>%
+  plotly::add_trace(
+    x = ~date,
+    y = ~totalCases,
+    type = "scatter",
+    mode = "lines+markers",
+    name = "Confirmed",
+    line = list(color = active_color),
+    marker = list(color = active_color)
+  ) %>%
+  plotly::add_trace(
+    x = ~date,
+    y = ~totalDeaths,
+    type = "scatter",
+    mode = "lines+markers",
+    name = "Death",
+    line = list(color = death_color),
+    marker = list(color = death_color)
+  ) %>%
+  
+  plotly::add_trace(
+    x = ~date,
+    y = ~totalRecoveries,
+    type = "scatter",
+    mode = "lines+markers",
+    name = "Recovered",
+    line = list(color = "black"),
+    marker = list(color ="black")
+  ) %>%
+  
+  plotly::layout(
+    title = "",
+    yaxis = list(title = "Cumulative number of cases"),
+    xaxis = list(title = "Date"),
+    legend = list(x = 0.1, y = 0.9),
+    hovermode = "compare"
+  )
+```
+
+
+
+
+
+
+
+
+
+About
+=======================================================================
+  
+  **The Covid-19 Dashboard for Nepal**
+  
+  This  provides an overview of the 2019 Novel Coronavirus COVID-19 (2019-nCoV) pandemic. This dashboard is built with R using the R Markdown framework and was adapted from this [dashboard](https://ramikrispin.github.io/coronavirus_dashboard/){target="_blank"} by Rami Krispin.
+
+
+**Data**
+  
+  The input data for this dashboard is available from the [`{coronavirus}`](https://nepalcorona.com/data/api){target="_blank"} .
+  
+ 
+
+The data and dashboard are refreshed on a daily basis.
+
+
+**Update**
+  
+  The data is as of `r format(max(df1$date), "%A %B %d, %Y")` and the dashboard has been updated on `r format(Sys.time(), "%A %B %d, %Y")`.
+
+
